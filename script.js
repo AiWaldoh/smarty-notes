@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Optional: Clear active state on other buttons when one is clicked
     tools.forEach(function(toolA) {
         toolA.addEventListener('click', function() {
             tools.forEach(function(toolB) {
@@ -29,12 +28,10 @@ document.querySelector('.font-size-dropdown').addEventListener('change', functio
 });
 const storage = new LocalStorageManager('noteAppData');
 
-// Save content whenever there's a change
 document.querySelector('.page').addEventListener('input', function() {
     storage.save(this.innerHTML);
 });
 
-// Load content when the page is loaded
 document.addEventListener('DOMContentLoaded', function() {
     const savedContent = storage.load();
     if (savedContent) {
@@ -51,15 +48,23 @@ function generateUUID() {
     });
 }
 
+
 function saveToFile(content) {
     const blob = new Blob([content], { type: 'text/html' });
     const a = document.getElementById('downloadAnchorElem');
     
+    // Prompt the user for a filename
+    const defaultName = 'note.html';
+    const filename = prompt("Enter a filename:", defaultName) || defaultName;
+    
     a.href = URL.createObjectURL(blob);
-    a.download = 'note.html';  // suggest a default name
+    a.download = filename;  // use the provided filename or the default name
     a.click();
+    // Set the active tab's name to the saved file's name (without extension)
+    const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
+    const activeTab = document.querySelector('.tab.active');
+    activeTab.innerHTML = filenameWithoutExtension + ' <span class="close-tab">X</span>';
 }
-
 
 document.getElementById('saveBtn').addEventListener('click', function() {
     const content = document.querySelector('.page').innerHTML;
@@ -69,16 +74,22 @@ document.getElementById('loadBtn').addEventListener('click', function() {
     document.getElementById('fileInput').click();
 });
 
+
 document.getElementById('fileInput').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             document.querySelector('.page').innerHTML = e.target.result;
+            // Set the active tab's name to the loaded file's name (without extension)
+            const filenameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+            const activeTab = document.querySelector('.tab.active');
+            activeTab.innerHTML = filenameWithoutExtension + ' <span class="close-tab">X</span>';
         };
         reader.readAsText(file);
     }
 });
+
 const tabBar = document.querySelector('.tab-bar');
 let activeTabId = "1"; // Default active tab
 
@@ -95,23 +106,12 @@ function makeTabActive(tabId) {
     });
 }
 
-// Event listener for clicking on a tab
 tabBar.addEventListener('click', function(event) {
     if (event.target.classList.contains('tab')) {
         makeTabActive(event.target.dataset.tabId);
     }
 });
 
-// Event listener for adding a new tab
-// document.getElementById('newTabBtn').addEventListener('click', function() {
-//     const newTabId = (Math.random() + 1).toString(36).substring(7);
-//     const newTab = document.createElement('button');
-//     newTab.className = 'tab';
-//     newTab.dataset.tabId = newTabId;
-//     newTab.textContent = 'Untitled';
-//     tabBar.insertBefore(newTab, this);
-//     makeTabActive(newTabId);
-// });
 document.addEventListener('DOMContentLoaded', function() {
     const tabBar = document.querySelector('.tab-bar');
     
@@ -120,11 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const tabToClose = event.target.parentElement;
             tabToClose.remove();
             
-            // Optionally, you can make another tab active here.
         }
     });
 });
-// Event listener for adding a new tab
 document.getElementById('newTabBtn').addEventListener('click', function() {
     const newTabId = (Math.random() + 1).toString(36).substring(7);
     const newTab = document.createElement('button');
@@ -134,4 +132,7 @@ document.getElementById('newTabBtn').addEventListener('click', function() {
     newTab.innerHTML = 'Untitled <span class="close-tab">X</span>';
     tabBar.insertBefore(newTab, this);
     makeTabActive(newTabId);
+    
+    // Clear the content of .page when a new tab is created
+    document.querySelector('.page').innerHTML = '';
 });
