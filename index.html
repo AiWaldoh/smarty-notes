@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Taking App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <a id="downloadAnchorElem" style="display:none"></a>
+    <div class="top-bar">
+        <div class="tab-bar">
+            <button class="tab active" data-tab-id="1">
+                Untitled
+                <span class="close-tab">X</span>
+            </button>
+            
+            <button id="newTabBtn">+</button>
+        </div>
+
+        <div class="toolbar">
+            <select title="font-size" class="font-size-dropdown">
+                <option value="1">Small</option>
+                <option value="3" selected>Normal</option>
+                <option value="5">Large</option>
+                <option value="7">Extra Large</option>
+            </select>
+
+            <button class="tool" data-command="bold">B</button>
+            <button class="tool" data-command="italic">I</button>
+            <button class="tool" data-command="underline">U</button>
+            <button class="tool" data-command="insertOrderedList">1.</button>
+            <button class="tool" data-command="insertUnorderedList">•</button>
+            <button class="tool" data-command="justifyLeft">L</button>
+            <button class="tool" data-command="justifyCenter">C</button>
+            <button class="tool" id="saveBtn">Save</button>
+            <input type="file" id="fileInput" style="display:none">
+            <button class="tool" id="loadBtn">Load</button>
+
+        </div>
+    </div>
+    <div class="page-container">
+        <div class="page" contenteditable="true"></div>
+    </div>
+    <script src="script.js" type="module"></script>
+
+</body>
+
+</html>

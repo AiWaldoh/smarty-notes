@@ -1,0 +1,132 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+.tab-bar, .toolbar {
+    clear: both;
+}
+
+.page-container {
+    width: 85%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page {
+    background-color: white;
+    width: 80%;
+    height: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 40px;
+    overflow-y: auto;
+    outline: none;
+}
+
+.page:focus {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.tab-bar {
+    display: flex;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+    z-index: 2;
+}
+
+.toolbar {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f4f4f4;
+    z-index: 1;
+}
+
+
+
+.tool {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 16px;
+}
+
+.tool:hover {
+    background-color: #e9e9e9;
+}
+
+.tool.active {
+    background-color: #d0d0d0;
+}
+.font-size-dropdown {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+
+.tab {
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab.active {
+    background-color: #fff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+#newTabBtn {
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#newTabBtn:hover {
+    background-color: #e7e7e7;
+}
+.close-tab {
+    float: right;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 0.8em;
+    color: #777;
+    transition: color 0.3s;
+}
+
+.close-tab:hover {
+    color: #444;
+}
