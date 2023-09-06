@@ -210,10 +210,10 @@ async function smartFormat(content) {
                 Authorization: `Bearer ${CONFIG.API_KEY}`,  // Use the key from the config file
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                max_tokens: 2048,
-                temperature: 0.7,
-                messages: [{ role: "user", content: 'format this text' + content }],
+                model: "gpt-3.5-turbo-16k",
+                max_tokens: 8096,
+                temperature: 0,
+                messages: [{ role: "user", content: 'format this text: ' + content }],
             }),
         });
 
@@ -224,14 +224,14 @@ async function smartFormat(content) {
 
         const data = await response.json();
         console.log(data);
-
+        const formattedContent = parseAndFormatCodeBlocks(data.choices[0].message.content);
         // Assuming you have a method to update the content of the current tab
-        updateTabContent(data.choices[0].message.content);
+        updateTabContent(formattedContent);
     } catch (e) {
         console.error(e);
     }
 }
-document.getElementById('smartFormatBtn').addEventListener('click', function() {
+document.getElementById('smartFormatBtn').addEventListener('click', function () {
     const currentContent = tabContent[activeTabId].content;
     smartFormat(currentContent);
 });
@@ -244,4 +244,18 @@ function updateTabContent(formattedContent) {
 
     // 3. Save the updated content to local storage
     saveTabsToLocalStorage();
+}
+page.addEventListener('paste', function () {
+    // Wait for a brief moment to ensure the pasted content is rendered
+    setTimeout(() => {
+        const currentContent = tabContent[activeTabId].content;
+        smartFormat(currentContent);
+    }, 200);
+});
+function parseAndFormatCodeBlocks(content) {
+    // Regular expression to match content enclosed within triple backticks
+    const regex = /```([\s\S]*?)```/g;
+
+    // Replace content within triple backticks with formatted code blocks
+    return content.replace(regex, '<pre class="code-block">$1</pre>');
 }

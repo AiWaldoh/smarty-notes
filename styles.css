@@ -153,6 +153,19 @@ body {
 .page-container {
     padding-top: 100px;  /* Assuming top-bar has a height of 100px */
 }
+
+.code-block {
+    display: block;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto;  
+    white-space: pre;  
+}
+
+
+
 /* do something from the 90s
 #smartFormatBtn {
     /* Add your custom styles here */
