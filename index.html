@@ -1,44 +1,56 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Note Taking App</title>
-<link href="styles.css" rel="stylesheet"/>
+    <title>Smarty Notes</title>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Note Taking App</title>
+    <link href="styles.css" rel="stylesheet" />
 </head>
+
 <body>
-<a id="downloadAnchorElem" style="display:none"></a>
-<div class="top-bar">
-<div class="tab-bar">
-<button class="tab active" data-tab-id="1">
+
+    <a id="downloadAnchorElem" style="display:none"></a>
+    <div class="top-bar">
+        <div class="tab-bar">
+            <button class="tab active" data-tab-id="1">
                 Untitled
                 <span class="close-tab">X</span>
-</button>
-<button id="newTabBtn">+</button>
-</div>
-<div class="toolbar">
-<select class="font-dropdown" title="font-family"><option value="Arial">Arial</option><option value="Times New Roman">Times New Roman</option><option value="Georgia">Georgia</option><option value="Helvetica">Helvetica</option><option value="Courier New">Courier New</option></select><select class="font-size-dropdown" title="font-size">
-<option value="1">Small</option>
-<option selected="" value="3">Normal</option>
-<option value="5">Large</option>
-<option value="7">Extra Large</option>
-</select>
-<button class="tool" data-command="bold">B</button>
-<button class="tool" data-command="italic">I</button>
-<button class="tool" data-command="underline">U</button>
-<button class="tool" data-command="insertOrderedList">1.</button>
-<button class="tool" data-command="insertUnorderedList">•</button>
-<button class="tool" data-command="justifyLeft">L</button>
-<button class="tool" data-command="justifyCenter">C</button>
-<button class="tool" id="saveBtn">Save</button>
-<input id="fileInput" style="display:none" type="file"/>
-<button class="tool" id="loadBtn">Load</button>
-</div>
-</div>
-<div class="page-container">
-<div class="page" contenteditable="true"></div>
-</div>
-<script src="script.js" type="module"></script>
+            </button>
+            <button id="newTabBtn">+</button>
+        </div>
+        <div class="toolbar">
+            <select class="font-dropdown" title="font-family">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Courier New">Courier New</option>
+            </select><select class="font-size-dropdown" title="font-size">
+                <option value="1">Small</option>
+                <option selected="" value="3">Normal</option>
+                <option value="5">Large</option>
+                <option value="7">Extra Large</option>
+            </select>
+            <button class="tool" data-command="bold">B</button>
+            <button class="tool" data-command="italic">I</button>
+            <button class="tool" data-command="underline">U</button>
+            <button class="tool" data-command="insertOrderedList">1.</button>
+            <button class="tool" data-command="insertUnorderedList">•</button>
+            <button class="tool" data-command="justifyLeft">L</button>
+            <button class="tool" data-command="justifyCenter">C</button>
+            <button class="tool" id="saveBtn">Save</button>
+            <input id="fileInput" style="display:none" type="file" />
+            <button class="tool" id="loadBtn">Load</button>
+        </div>
+    </div>
+    <div class="page-container">
+        <div class="page" contenteditable="true"></div>
+    </div>
+    <script src="script.js" type="module"></script>
 </body>
+
 </html>

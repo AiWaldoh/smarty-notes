@@ -1,21 +1,48 @@
-
-import { LocalStorageManager } from './LocalStorageManager.js';
-
-// Initialize when DOM is fully loaded
 let tabContent = {};
 const page = document.querySelector('.page');
-document.addEventListener('DOMContentLoaded', function() {
-    
+const tabBar = document.querySelector('.tab-bar');
+let activeTabId = "1";  // Default active tab
+
+document.addEventListener('DOMContentLoaded', function () {
     initializeTools();
     initializeFontSizeDropdown();
     initializeFontDropdown();
-    loadSavedContent();
+
+    if (!localStorage.getItem('noteAppTabContent')) {
+        tabContent = {
+            "1": {
+                name: 'Untitled',
+                content: page.innerHTML || ''
+            }
+        };
+        activeTabId = "1";
+        saveTabsToLocalStorage();
+    } else {
+        loadTabsFromLocalStorage();  // Load tabs when the page loads
+    }
+
+    attachTabBarListeners();    // Attach event listeners to the tab bar
+
+    // Save content to tabContent and local storage whenever it changes
+    page.addEventListener('input', function () {
+        tabContent[activeTabId].content = page.innerHTML;
+        saveTabsToLocalStorage();
+    });
 });
+
+
+
+// Save content to tabContent and local storage whenever it changes
+page.addEventListener('input', function () {
+    tabContent[activeTabId].content = page.innerHTML;
+    saveTabsToLocalStorage();
+});
+
 
 function initializeTools() {
     const tools = document.querySelectorAll('.tool');
     tools.forEach(tool => {
-        tool.addEventListener('click', function(e) {
+        tool.addEventListener('click', function (e) {
             const command = this.getAttribute('data-command');
             document.execCommand(command, false, null);
             this.classList.toggle('active');
@@ -34,75 +61,58 @@ function deactivateOtherTools(activeTool) {
 }
 
 function initializeFontSizeDropdown() {
-    document.querySelector('.font-size-dropdown').addEventListener('change', function() {
+    document.querySelector('.font-size-dropdown').addEventListener('change', function () {
         const size = this.value;
         document.execCommand('fontSize', false, size);
     });
 }
 
 function initializeFontDropdown() {
-    document.querySelector('.font-dropdown').addEventListener('change', function() {
+    document.querySelector('.font-dropdown').addEventListener('change', function () {
         const font = this.value;
         document.execCommand('fontName', false, font);
     });
 }
 
-function loadSavedContent() {
-    const storage = new LocalStorageManager('noteAppData');
-    
-    
-    // Save content on input
-    
-    
-    page.addEventListener('input', function() {
-        tabContent[activeTabId] = this.innerHTML;
-        localStorage.setItem('noteAppTabContent', JSON.stringify(tabContent));
-    });
-
-    // Load saved content
-    const savedContent = storage.load();
-    if (savedContent) {
-        page.innerHTML = savedContent;
-    }
-}
-
-
-
 function saveToFile(content) {
     const blob = new Blob([content], { type: 'text/html' });
     const a = document.getElementById('downloadAnchorElem');
-    
-    // Prompt the user for a filename
     const defaultName = 'note.html';
     const filename = prompt("Enter a filename:", defaultName) || defaultName;
-    
+
     a.href = URL.createObjectURL(blob);
-    a.download = filename;  // use the provided filename or the default name
+    a.download = filename;
     a.click();
     // Set the active tab's name to the saved file's name (without extension)
     const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
+    tabContent[activeTabId].name = filenameWithoutExtension;  // Update tab name in tabContent
     const activeTab = document.querySelector('.tab.active');
     activeTab.innerHTML = filenameWithoutExtension + ' <span class="close-tab">X</span>';
+    saveTabsToLocalStorage();  // Save updated tabContent to local storage
 }
 
-
-document.getElementById('saveBtn').addEventListener('click', function() {
-    const content = document.querySelector('.page').innerHTML;
+document.getElementById('saveBtn').addEventListener('click', function () {
+    const content = page.innerHTML;
     saveToFile(content);
+    tabContent[activeTabId].content = content;  // Save current content to tabContent object
+    saveTabsToLocalStorage();  // Save updated tabContent to local storage
 });
-document.getElementById('loadBtn').addEventListener('click', function() {
+
+document.getElementById('loadBtn').addEventListener('click', function () {
     document.getElementById('fileInput').click();
 });
 
-
-document.getElementById('fileInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
+document.getElementById('fileInput').addEventListener('change', function () {
+    const file = this.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.querySelector('.page').innerHTML = e.target.result;
-            // Set the active tab's name to the loaded file's name (without extension)
+        reader.onload = function () {
+            page.innerHTML = reader.result;
+            tabContent[activeTabId].content = reader.result;  // Save loaded content to tabContent object
+            saveTabsToLocalStorage();  // Save updated tabContent to local storage
+            // Update the active tab's name based on file name (without extension)
             const filenameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+            tabContent[activeTabId].name = filenameWithoutExtension;  // Update tab name in tabContent
             const activeTab = document.querySelector('.tab.active');
             activeTab.innerHTML = filenameWithoutExtension + ' <span class="close-tab">X</span>';
         };
@@ -110,19 +120,57 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
     }
 });
 
-const tabBar = document.querySelector('.tab-bar');
+function saveTabsToLocalStorage() {
+    localStorage.setItem('noteAppTabContent', JSON.stringify(tabContent));
+}
 
-let activeTabId = "1"; // Default active tab
+function loadTabsFromLocalStorage() {
+    const storedTabContent = localStorage.getItem('noteAppTabContent');
+    if (storedTabContent) {
+        tabContent = JSON.parse(storedTabContent);
 
-const storedTabContent = localStorage.getItem('noteAppTabContent');
-if (storedTabContent) {
-    tabContent = JSON.parse(storedTabContent);
-    page.innerHTML = tabContent[activeTabId] || "";
+        // Clear existing tabs except for the 'New Tab' button
+        const existingTabs = document.querySelectorAll('.tab');
+        existingTabs.forEach(tab => tab.remove());
+
+        // Populate the tabs from the stored data
+        for (const tabId in tabContent) {
+            const newTab = document.createElement('button');
+            newTab.className = 'tab';
+            newTab.dataset.tabId = tabId;
+            newTab.innerHTML = tabContent[tabId].name + ' <span class="close-tab">X</span>';
+            tabBar.insertBefore(newTab, document.getElementById('newTabBtn'));
+        }
+
+        // Set content of the active tab
+        page.innerHTML = tabContent[activeTabId].content || '';
+    }
+}
+
+
+function attachTabBarListeners() {
+    // Listener for switching tabs
+    tabBar.addEventListener('click', function (event) {
+        if (event.target.classList.contains('tab')) {
+            const selectedTabId = event.target.dataset.tabId;
+            makeTabActive(selectedTabId);
+            page.innerHTML = tabContent[selectedTabId] ? tabContent[selectedTabId].content : "";
+        }
+    });
+
+    // Listener for closing tabs
+    tabBar.addEventListener('click', function (event) {
+        if (event.target.classList.contains('close-tab')) {
+            const tabToClose = event.target.parentElement;
+            delete tabContent[tabToClose.dataset.tabId];  // Remove from tabContent object
+            saveTabsToLocalStorage();  // Update local storage
+            tabToClose.remove();
+        }
+    });
 }
 
 
 
-// Function to make a tab active
 function makeTabActive(tabId) {
     const allTabs = document.querySelectorAll('.tab');
     allTabs.forEach(tab => {
@@ -133,45 +181,22 @@ function makeTabActive(tabId) {
             tab.classList.remove('active');
         }
     });
+    page.innerHTML = tabContent[tabId] && tabContent[tabId].content ? tabContent[tabId].content : '';
 }
 
-tabBar.addEventListener('click', function(event) {
-    
-    if (event.target.classList.contains('tab')) {
-        const selectedTabId = event.target.dataset.tabId;
-        makeTabActive(selectedTabId);
-        page.innerHTML = tabContent[selectedTabId] || "";  // Load content or default to empty string
-    }
-
-    
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    
-    const tabBar = document.querySelector('.tab-bar');
-    
-    tabBar.addEventListener('click', function(event) {
-        if (event.target.classList.contains('close-tab')) {
-            const tabToClose = event.target.parentElement;
-            tabToClose.remove();
-            
-        }
-    });
-});
-document.getElementById('newTabBtn').addEventListener('click', function() {
-    
+document.getElementById('newTabBtn').addEventListener('click', function () {
     const newTabId = (Math.random() + 1).toString(36).substring(7);
-    tabContent[newTabId] = "";  // Initialize content for the new tab
+    tabContent[newTabId] = {
+        name: 'Untitled',  // Default name
+        content: ''        // Default content
+    };
+    saveTabsToLocalStorage();  // Save updated tabContent to local storage
 
     const newTab = document.createElement('button');
     newTab.className = 'tab';
     newTab.dataset.tabId = newTabId;
-    
     newTab.innerHTML = 'Untitled <span class="close-tab">X</span>';
     tabBar.insertBefore(newTab, this);
     makeTabActive(newTabId);
-    
-    // Clear the content of .page when a new tab is created
     document.querySelector('.page').innerHTML = '';
 });
