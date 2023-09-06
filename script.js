@@ -1,52 +1,71 @@
+
 import { LocalStorageManager } from './LocalStorageManager.js';
 
-document.querySelector('.page').focus();
+// Initialize when DOM is fully loaded
+let tabContent = {};
+const page = document.querySelector('.page');
 document.addEventListener('DOMContentLoaded', function() {
-    let tools = document.querySelectorAll('.tool');
+    
+    initializeTools();
+    initializeFontSizeDropdown();
+    initializeFontDropdown();
+    loadSavedContent();
+});
 
-    tools.forEach(function(tool) {
+function initializeTools() {
+    const tools = document.querySelectorAll('.tool');
+    tools.forEach(tool => {
         tool.addEventListener('click', function(e) {
-            let command = this.getAttribute('data-command');
+            const command = this.getAttribute('data-command');
             document.execCommand(command, false, null);
             this.classList.toggle('active');
+            deactivateOtherTools(this);
         });
-    });
-
-    tools.forEach(function(toolA) {
-        toolA.addEventListener('click', function() {
-            tools.forEach(function(toolB) {
-                if (toolA !== toolB) {
-                    toolB.classList.remove('active');
-                }
-            });
-        });
-    });
-});
-document.querySelector('.font-size-dropdown').addEventListener('change', function() {
-    let size = this.value;
-    document.execCommand('fontSize', false, size);
-});
-const storage = new LocalStorageManager('noteAppData');
-
-document.querySelector('.page').addEventListener('input', function() {
-    storage.save(this.innerHTML);
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const savedContent = storage.load();
-    if (savedContent) {
-        document.querySelector('.page').innerHTML = savedContent;
-    }
-});
-const saveKey = 'noteAppUUID'; // Key to save/retrieve UUID from local storage
-
-// Function to generate a UUID
-function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
     });
 }
+
+function deactivateOtherTools(activeTool) {
+    const tools = document.querySelectorAll('.tool');
+    tools.forEach(tool => {
+        if (tool !== activeTool) {
+            tool.classList.remove('active');
+        }
+    });
+}
+
+function initializeFontSizeDropdown() {
+    document.querySelector('.font-size-dropdown').addEventListener('change', function() {
+        const size = this.value;
+        document.execCommand('fontSize', false, size);
+    });
+}
+
+function initializeFontDropdown() {
+    document.querySelector('.font-dropdown').addEventListener('change', function() {
+        const font = this.value;
+        document.execCommand('fontName', false, font);
+    });
+}
+
+function loadSavedContent() {
+    const storage = new LocalStorageManager('noteAppData');
+    
+    
+    // Save content on input
+    
+    
+    page.addEventListener('input', function() {
+        tabContent[activeTabId] = this.innerHTML;
+        localStorage.setItem('noteAppTabContent', JSON.stringify(tabContent));
+    });
+
+    // Load saved content
+    const savedContent = storage.load();
+    if (savedContent) {
+        page.innerHTML = savedContent;
+    }
+}
+
 
 
 function saveToFile(content) {
@@ -65,6 +84,7 @@ function saveToFile(content) {
     const activeTab = document.querySelector('.tab.active');
     activeTab.innerHTML = filenameWithoutExtension + ' <span class="close-tab">X</span>';
 }
+
 
 document.getElementById('saveBtn').addEventListener('click', function() {
     const content = document.querySelector('.page').innerHTML;
@@ -91,7 +111,16 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
 });
 
 const tabBar = document.querySelector('.tab-bar');
+
 let activeTabId = "1"; // Default active tab
+
+const storedTabContent = localStorage.getItem('noteAppTabContent');
+if (storedTabContent) {
+    tabContent = JSON.parse(storedTabContent);
+    page.innerHTML = tabContent[activeTabId] || "";
+}
+
+
 
 // Function to make a tab active
 function makeTabActive(tabId) {
@@ -107,12 +136,19 @@ function makeTabActive(tabId) {
 }
 
 tabBar.addEventListener('click', function(event) {
+    
     if (event.target.classList.contains('tab')) {
-        makeTabActive(event.target.dataset.tabId);
+        const selectedTabId = event.target.dataset.tabId;
+        makeTabActive(selectedTabId);
+        page.innerHTML = tabContent[selectedTabId] || "";  // Load content or default to empty string
     }
+
+    
 });
 
+
 document.addEventListener('DOMContentLoaded', function() {
+    
     const tabBar = document.querySelector('.tab-bar');
     
     tabBar.addEventListener('click', function(event) {
@@ -124,7 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 document.getElementById('newTabBtn').addEventListener('click', function() {
+    
     const newTabId = (Math.random() + 1).toString(36).substring(7);
+    tabContent[newTabId] = "";  // Initialize content for the new tab
+
     const newTab = document.createElement('button');
     newTab.className = 'tab';
     newTab.dataset.tabId = newTabId;

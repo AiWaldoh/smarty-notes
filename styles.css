@@ -14,7 +14,7 @@ body {
 
 .page-container {
     width: 85%;
-    height: 90%;
+    height: calc(90% - 100px); /* Adjusted for top-bar height */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,7 +23,7 @@ body {
 .page {
     background-color: white;
     width: 80%;
-    height: 90%;
+    height: calc(100% - 20px); /* Allow some space for better appearance */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     padding: 40px;
@@ -129,4 +129,27 @@ body {
 
 .close-tab:hover {
     color: #444;
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+    }
+    .tool, .font-dropdown, .font-size-dropdown {
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 20px;
+    }
+    .tool, .font-dropdown, .font-size-dropdown {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
+
+.page-container {
+    padding-top: 100px;  /* Assuming top-bar has a height of 100px */
 }
