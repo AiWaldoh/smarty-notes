@@ -200,3 +200,48 @@ document.getElementById('newTabBtn').addEventListener('click', function () {
     makeTabActive(newTabId);
     document.querySelector('.page').innerHTML = '';
 });
+
+async function smartFormat(content) {
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${CONFIG.API_KEY}`,  // Use the key from the config file
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                max_tokens: 2048,
+                temperature: 0.7,
+                messages: [{ role: "user", content: 'format this text' + content }],
+            }),
+        });
+
+        if (!response.ok) {
+            console.error(`Error: ${response.statusText}`);
+            return;
+        }
+
+        const data = await response.json();
+        console.log(data);
+
+        // Assuming you have a method to update the content of the current tab
+        updateTabContent(data.choices[0].message.content);
+    } catch (e) {
+        console.error(e);
+    }
+}
+document.getElementById('smartFormatBtn').addEventListener('click', function() {
+    const currentContent = tabContent[activeTabId].content;
+    smartFormat(currentContent);
+});
+function updateTabContent(formattedContent) {
+    // 1. Update the tabContent object
+    tabContent[activeTabId].content = formattedContent;
+
+    // 2. Update the displayed content
+    page.innerHTML = formattedContent;
+
+    // 3. Save the updated content to local storage
+    saveTabsToLocalStorage();
+}
