@@ -19,9 +19,10 @@ A minimalist note-taking application to capture your thoughts efficiently. Just 
     Navigate to the project directory:
     ```
     cd note-taking-app
+    python -m http.server
     ```
 
-    Open index.html in your preferred browser.
+    Make sure to run the python server. Open the page in your preferred browser.
 
 ### 📝 License
 
